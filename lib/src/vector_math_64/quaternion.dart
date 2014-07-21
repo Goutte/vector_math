@@ -293,22 +293,47 @@ class Quaternion {
     return v;
   }
 
-  /// Scales [this] by [scale].
-  Quaternion scale(double scale) {
-    storage[3] = storage[3] * scale;
-    storage[2] = storage[2] * scale;
-    storage[1] = storage[1] * scale;
-    storage[0] = storage[0] * scale;
+  /// Scales [this] quaternion by [amount].
+  Quaternion scale(double amount) {
+    storage[3] = storage[3] * amount;
+    storage[2] = storage[2] * amount;
+    storage[1] = storage[1] * amount;
+    storage[0] = storage[0] * amount;
     return this;
   }
 
-  /// Scaled copy of [this].
-  Quaternion scaled(double scale) {
+  /// Returns a copy of [this] quaternion scaled by [amount].
+  Quaternion scaled(double amount) {
     Quaternion q = new Quaternion.copy(this);
-    return q.scale(scale);
+    return q.scale(amount);
   }
 
-  /// [this] rotated by [other].
+  /// Pretty unsure about this design pattern conformance with vector_math guidelines.
+  /// `out` position is debatable, as the rest of this lib uses last.
+  /// Also, must refactor operator * too, then.
+  static Quaternion multiply(Quaternion out, Quaternion a, Quaternion b) {
+    double _w = a.storage[3];
+    double _z = a.storage[2];
+    double _y = a.storage[1];
+    double _x = a.storage[0];
+    double ow = b.storage[3];
+    double oz = b.storage[2];
+    double oy = b.storage[1];
+    double ox = b.storage[0];
+    out.storage[0] = _w * ox + _x * ow + _y * oz - _z * oy;
+    out.storage[1] = _w * oy + _y * ow + _z * ox - _x * oz;
+    out.storage[2] = _w * oz + _z * ow + _x * oy - _y * ox;
+    out.storage[3] = _w * ow - _x * ox - _y * oy - _z * oz;
+    return out;
+  }
+
+  /// [this] rotated by [other], result put into [out] and returned.
+  Quaternion multiplyInto(Quaternion other, Quaternion out) {
+    return Quaternion.multiply(out, this, other);
+  }
+
+  /// Returns a new quaternion representing [this] quaternion
+  /// rotated by an [other] quaternion.
   Quaternion operator*(Quaternion other) {
     double _w = storage[3];
     double _z = storage[2];
@@ -324,7 +349,7 @@ class Quaternion {
                     _w * ow - _x * ox - _y * oy - _z * oz);
   }
 
-  /// Returns copy of [this] + [other].
+  /// Returns a copy of [this] + [other].
   Quaternion operator+(Quaternion other) {
     return new Quaternion(storage[0] + other.storage[0],
                     storage[1] + other.storage[1],
@@ -332,7 +357,7 @@ class Quaternion {
                     storage[3] + other.storage[3]);
   }
 
-  /// Returns copy of [this] - [other].
+  /// Returns a copy of [this] - [other].
   Quaternion operator-(Quaternion other) {
     return new Quaternion(storage[0] - other.storage[0],
                     storage[1] - other.storage[1],
@@ -340,7 +365,7 @@ class Quaternion {
                     storage[3] - other.storage[3]);
   }
 
-  /// Returns negated copy of [this].
+  /// Returns a negated copy of [this].
   Quaternion operator-() {
     return new Quaternion(-storage[0], -storage[1], -storage[2], -storage[3]);
   }
