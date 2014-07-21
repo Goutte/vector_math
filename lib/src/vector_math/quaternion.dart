@@ -40,35 +40,9 @@ class Quaternion {
     storage[3] = w;
   }
 
-  /// From a rotation matrix [rotationMatrix].
+  /// Constructs from a 3x3 [rotationMatrix].
   Quaternion.fromRotation(Matrix3 rotationMatrix) : storage = new Float32List(4) {
-    double trace = rotationMatrix.trace();
-    if (trace > 0.0) {
-      double s = Math.sqrt(trace + 1.0);
-      storage[3] = s * 0.5;
-      s = 0.5 / s;
-      storage[0] = (rotationMatrix.storage[5] -
-                     rotationMatrix.storage[7]) * s;
-      storage[1] = (rotationMatrix.storage[6] -
-                     rotationMatrix.storage[2]) * s;
-      storage[2] = (rotationMatrix.storage[1] -
-                     rotationMatrix.storage[3]) * s;
-    } else {
-      int i = rotationMatrix.storage[0] < rotationMatrix.storage[4] ?
-              (rotationMatrix.storage[4] < rotationMatrix.storage[8] ? 2 : 1)
-              :
-              (rotationMatrix.storage[0] < rotationMatrix.storage[8] ? 2 : 0);
-      int j = (i + 1) % 3;
-      int k = (i + 2) % 3;
-      double s = Math.sqrt(rotationMatrix.entry(i,i) -
-                           rotationMatrix.entry(j,j) -
-                           rotationMatrix.entry(k,k) + 1.0);
-      storage[i] = s * 0.5;
-      s = 0.5 / s;
-      storage[3] = (rotationMatrix.entry(k,j) - rotationMatrix.entry(j,k)) * s;
-      storage[j] = (rotationMatrix.entry(j,i) + rotationMatrix.entry(i,j)) * s;
-      storage[k] = (rotationMatrix.entry(k,i) + rotationMatrix.entry(i,k)) * s;
-    }
+    setRotation(rotationMatrix);
   }
 
   /// Rotation of [angle] around [axis].
@@ -184,6 +158,37 @@ class Quaternion {
     storage[1] = cosRoll * cosPitch * sinYaw - sinRoll * sinPitch * cosYaw;
     storage[2] = sinRoll * cosPitch * cosYaw - cosRoll * sinPitch * sinYaw;
     storage[3] = cosRoll * cosPitch * cosYaw + sinRoll * sinPitch * sinYaw;
+  }
+
+  /// Sets quaternion from a 3x3 [rotationMatrix].
+  void setRotation(Matrix3 rotationMatrix) {
+    double trace = rotationMatrix.trace();
+    if (trace > 0.0) {
+      double s = Math.sqrt(trace + 1.0);
+      storage[3] = s * 0.5;
+      s = 0.5 / s;
+      storage[0] = (rotationMatrix.storage[5] -
+      rotationMatrix.storage[7]) * s;
+      storage[1] = (rotationMatrix.storage[6] -
+      rotationMatrix.storage[2]) * s;
+      storage[2] = (rotationMatrix.storage[1] -
+      rotationMatrix.storage[3]) * s;
+    } else {
+      int i = rotationMatrix.storage[0] < rotationMatrix.storage[4] ?
+      (rotationMatrix.storage[4] < rotationMatrix.storage[8] ? 2 : 1)
+      :
+      (rotationMatrix.storage[0] < rotationMatrix.storage[8] ? 2 : 0);
+      int j = (i + 1) % 3;
+      int k = (i + 2) % 3;
+      double s = Math.sqrt(rotationMatrix.entry(i,i) -
+      rotationMatrix.entry(j,j) -
+      rotationMatrix.entry(k,k) + 1.0);
+      storage[i] = s * 0.5;
+      s = 0.5 / s;
+      storage[3] = (rotationMatrix.entry(k,j) - rotationMatrix.entry(j,k)) * s;
+      storage[j] = (rotationMatrix.entry(j,i) + rotationMatrix.entry(i,j)) * s;
+      storage[k] = (rotationMatrix.entry(k,i) + rotationMatrix.entry(i,k)) * s;
+    }
   }
 
   /// Normalize [this].
