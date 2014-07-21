@@ -308,6 +308,29 @@ class Quaternion {
     return q.scale(scale);
   }
 
+  /// Pretty unsure about this design pattern conformance with vector_math guidelines
+  /// Also, must refactor operator * too then.
+  static Quaternion multiply(Quaternion out, Quaternion a, Quaternion b) {
+    double _w = a.storage[3];
+    double _z = a.storage[2];
+    double _y = a.storage[1];
+    double _x = a.storage[0];
+    double ow = b.storage[3];
+    double oz = b.storage[2];
+    double oy = b.storage[1];
+    double ox = b.storage[0];
+    out.storage[0] = _w * ox + _x * ow + _y * oz - _z * oy;
+    out.storage[1] = _w * oy + _y * ow + _z * ox - _x * oz;
+    out.storage[2] = _w * oz + _z * ow + _x * oy - _y * ox;
+    out.storage[3] = _w * ow - _x * ox - _y * oy - _z * oz;
+    return out;
+  }
+
+  /// [this] rotated by [other], result put into [out] and returned.
+  Quaternion multiplyInto(Quaternion other, Quaternion out) {
+    return Quaternion.multiply(out, this, other);
+  }
+
   /// [this] rotated by [other].
   Quaternion operator*(Quaternion other) {
     double _w = storage[3];
