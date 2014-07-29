@@ -45,6 +45,13 @@ class Triangle {
     _point1 = new Vector3.copy(point1_),
     _point2 = new Vector3.copy(point2_) {}
 
+  Triangle.coordinates(double p0a, double p0b, double p0c,
+                       double p1a, double p1b, double p1c,
+                       double p2a, double p2b, double p2c) :
+    _point0 = new Vector3(p0a, p0b, p0c),
+    _point1 = new Vector3(p1a, p1b, p1c),
+    _point2 = new Vector3(p2a, p2b, p2c) {}
+
   void copyOriginDirection(Vector3 point0_, Vector3 point1_, Vector3 point2_) {
     point0_.setFrom(_point0);
     point1_.setFrom(_point1);
